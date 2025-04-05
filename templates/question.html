@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+            <div>
+                <a class="btn btn-primary navbar-brand text-light" href="#">AskGusev.</a>
+            </div>
+            
+            <form class="d-flex gap-3" role="search">
+                <div class="input-group">
+                    <div class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                      </svg></div>
+                    <input type="text" class="form-control" placeholder="Search">
+                  </div>
+                <button class="btn btn-outline-success" type="submit">Ask</button>
+            </form>
+
+            <div class="d-flex gap-2 align-items-center">
+                <div>
+                    <img src="img/placeholder.png" class="rounded-circle" style="object-fit: cover; width: 40px; height: 40px;">
+                </div>
+                <div class="content">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary">Dr. Peper</button>
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                          <span class="visually-hidden">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="#">Settings</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="#">Log out</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <main class="mt-2 col-8">
+                <div class="row">
+                    <section class="col vh-100">
+                        <article class="d-flex mt-3 gap-2 flex-column">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <div style="height: 100px;" class="mb-2 w-100">
+                                                <img src="img/placeholder.png" alt="img" class="img-fluid rounded">
+                                            </div>
+                                            <div>
+                                                <div class="d-flex flex-column align-items-center gap-2">
+                                                    <button class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center" title="Повысить рейтинг"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-circle" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707z"/>
+                                                      </svg></button>
+                                                    
+                                                    <div class="fs-7 fw-bold border border-secondary w-100 text-center" id="rating-value">5</div>
+                                                    
+                                                    <button class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center" title="Понизить рейтинг"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                                      </svg></button>
+                                                  </div>
+                                            </div>
+                                        </div>
+                                        <div class="col d-flex flex-column justify-content-between">
+                                            <div>
+                                                <h5 class="card-title">How to build a moon park?</h5>
+                                                <p class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Officiis accusamus vero quod eum.</p>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <span>Tags:</span>
+                                                    <span class="badge rounded-pill text-bg-primary">Perl</span>
+                                                    <span class="badge rounded-pill text-bg-secondary">HandMade</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr class="hr">
+                            <nav>
+                                <ul class="pagination">
+                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                            </nav>
+        
+                            <div class="card ">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <div style="height: 100px;" class="mb-2 w-100">
+                                                <img src="img/placeholder.png" alt="img" class="img-fluid rounded">
+                                            </div>
+                                            <div>
+                                                <div class="d-flex flex-column align-items-center gap-2">
+                                                    <button class="btn btn-outline-success w-100 d-flex align-items-center justify-content-center" title="Повысить рейтинг"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-circle" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707z"/>
+                                                      </svg></button>
+                                                    
+                                                    <div class="fs-7 fw-bold border border-secondary w-100 text-center" id="rating-value">5</div>
+                                                    
+                                                    <button class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center" title="Понизить рейтинг"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
+                                                      </svg></button>
+                                                  </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col d-flex flex-column justify-content-between">
+                                            <div>
+                                                <p class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Officiis accusamus vero quod eum.</p>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                                        <label class="form-check-label" for="flexCheckDefault">
+                                                            Correct!
+                                                        </label>
+                                                    </div>
+                                                </div>                                             
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="hr">
+                            <div class="answer-area">
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="col-form-label">Do you have answer?</label>
+                                        <textarea id="answer-text" class="form-control" placeholder="Enter your answer here."></textarea>
+                                        <button class="mt-2 btn btn-success">Answer</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                        </article>
+                    </section>
+                </div>
+            </main>
+
+            <div class="col-3">
+                <aside>
+                    <section class="mb-3 mt-5">
+                        <h3>Popular tags</h3>
+                        <div>
+                            <span class="badge text-bg-primary">Perl</span>
+                            <span class="badge text-bg-secondary">Python</span>
+                            <span class="badge text-bg-success">MySql</span>
+                            <span class="badge text-bg-danger">TechnoPark</span>
+                            <span class="badge text-bg-warning">django</span>
+                            <span class="badge text-bg-info">Mail.ru</span>
+                            <span class="badge text-bg-light">Light</span>
+                        </div>
+                    </section>
+            
+                    <section>
+                        <h3>Best members</h3>
+                        <div>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Mr. Freeman</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Dr. House</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Bender</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Queen Victoria</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">A Gusev</a>
+                        </div>
+                    </section>
+            
+                </aside>
+            </div>
+        </div>
+    </div>
+        
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

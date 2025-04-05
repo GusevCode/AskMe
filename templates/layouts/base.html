@@ -1,0 +1,81 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+            <div>
+                <a class="btn btn-primary navbar-brand text-light" href="{% url "index" %}">AskGusev.</a>
+            </div>
+
+            <form class="d-flex gap-3" role="search">
+                <div class="input-group">
+                    <div class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                      </svg></div>
+                    <input type="text" class="form-control" placeholder="Search">
+                  </div>
+                <button class="btn btn-outline-success" type="submit">Ask</button>
+            </form>
+
+            <div class="d-flex gap-2 align-items-center">
+                <div class="content">
+                    <button class="btn btn-primary">Log in</button>
+                    <button class="btn btn-success">Register</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <main class="mt-2 col-8">
+                <div class="row">
+                    <section class="col vh-100">
+                        {% block content %}
+                        {% endblock %}
+                    </section>
+                </div>
+            </main>
+
+            <div class="col-3">
+                <aside>
+                    <section class="mb-3 mt-5">
+                        <h3>Popular tags</h3>
+                        <div>
+                            <span class="badge text-bg-primary">Perl</span>
+                            <span class="badge text-bg-secondary">Python</span>
+                            <span class="badge text-bg-success">MySql</span>
+                            <span class="badge text-bg-danger">TechnoPark</span>
+                            <span class="badge text-bg-warning">django</span>
+                            <span class="badge text-bg-info">Mail.ru</span>
+                            <span class="badge text-bg-light">Light</span>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3>Best members</h3>
+                        <div>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Mr. Freeman</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Dr. House</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Bender</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Queen Victoria</a>
+                            <a class="d-block btn btn-outline-secondary mt-2" href="#">A Gusev</a>
+                        </div>
+                    </section>
+
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
