@@ -1,0 +1,23 @@
+.card img {
+    height: 100%;
+    width: 100%;
+}
+
+.ask-form textarea {
+    height: 150px;
+}
+
+.user-image > img {
+    object-fit: cover; width: 40px; height: 40px;
+}
+
+.card-title {
+    text-decoration: none;
+}
+
+.avatar-selection-block img {
+    border-radius: 5px;
+    height: 200px;
+    margin-left: 0;
+    margin-bottom: 10px;
+}
