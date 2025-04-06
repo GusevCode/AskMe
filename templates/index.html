@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 {% block content %}
-    <div class="d-flex align-items-center gap-2 mb-4">
+    <div class="d-flex align-items-center gap-2 mb-4 mt-3">
         <h1>New Questions</h1>
         <button type="button" class="btn btn-primary">
             <svg width="16" height="16" fill="white"><path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16m0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15"></path></svg>
@@ -24,33 +24,4 @@
             <li class="page-item"><a class="page-link" href="#">Next</a></li>
         </ul>
     </nav>
-
-    <div class="col-3">
-        <aside>
-            <section class="mb-3 mt-5">
-                <h3>Popular tags</h3>
-                <div>
-                    <span class="badge text-bg-primary">Perl</span>
-                    <span class="badge text-bg-secondary">Python</span>
-                    <span class="badge text-bg-success">MySql</span>
-                    <span class="badge text-bg-danger">TechnoPark</span>
-                    <span class="badge text-bg-warning">django</span>
-                    <span class="badge text-bg-info">Mail.ru</span>
-                    <span class="badge text-bg-light">Light</span>
-                </div>
-            </section>
-
-            <section>
-                <h3>Best members</h3>
-                <div>
-                    <a class="d-block btn btn-outline-secondary mt-2" href="#">Mr. Freeman</a>
-                    <a class="d-block btn btn-outline-secondary mt-2" href="#">Dr. House</a>
-                    <a class="d-block btn btn-outline-secondary mt-2" href="#">Bender</a>
-                    <a class="d-block btn btn-outline-secondary mt-2" href="#">Queen Victoria</a>
-                    <a class="d-block btn btn-outline-secondary mt-2" href="#">A Gusev</a>
-                </div>
-            </section>
-
-        </aside>
-    </div>
 {% endblock %}

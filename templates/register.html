@@ -1,115 +1,41 @@
-<!doctype html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container">
-            <div>
-                <a class="btn btn-primary navbar-brand text-light" href="#">AskGusev.</a>
-            </div>
-            
-            <form class="d-flex gap-3" role="search">
-                <div class="input-group">
-                    <div class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                      </svg></div>
-                    <input type="text" class="form-control" placeholder="Search">
-                  </div>
-                <button class="btn btn-outline-success" type="submit">Ask</button>
-            </form>
-
-            <div class="d-flex gap-2 align-items-center">
-                <div class="content">
-                    <button class="btn btn-primary">Log in</button>
-                    <button class="btn btn-success">Register</button>
-                </div>
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block content %}
+<div class="mb-4 mt-3">
+    <h1>Register</h1>
+</div>
+<div class="mt-3 settings-form">
+    <form>
+        <div class="form-text text-danger mb-3">Sorry, this email already exist!</div>
+        <div class="mb-3 d-flex justify-content-between gap-2">
+            <label class="col-form-label">Login</label>
+            <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
+        </div>
+        <div class="mb-3 d-flex justify-content-between gap-2">
+            <label class="col-form-label">Email</label>
+            <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
+        </div>
+        <div class="mb-3 d-flex justify-content-between gap-2">
+            <label class="col-form-label">NickName</label>
+            <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
+        </div>
+        <div class="mb-3 d-flex justify-content-between gap-2">
+            <label class="col-form-label">Password</label>
+            <input type="password" class="form-control w-75" maxlength="35" placeholder="Enter password here"></input>
+        </div>
+        <div class="mb-3 d-flex justify-content-between gap-2">
+            <label class="col-form-label">Repeat password</label>
+            <input type="password" class="form-control w-75" maxlength="35" placeholder="Repeat password here"></input>
+        </div>
+        <div class="mb-3 d-flex justify-content-between gap-2">
+            <label class="col-form-label">Upload avatar</label>
+            <div class="avatar-selection-block w-75">
+                <input class="form-control w-100" type="file"></input>
             </div>
         </div>
-    </nav>
-
-    <div class="container">
-        <div class="row">
-            <main class="mt-2 col-8">
-                <div class="row">
-                    <section class="col vh-100">
-                        <div class="mb-4 mt-3">
-                            <h1>Register</h1>
-                        </div>
-                        <div class="mt-3 settings-form">
-                            <form>
-                                <div class="form-text text-danger mb-3">Sorry, this email already exist!</div>
-                                <div class="mb-3 d-flex justify-content-between gap-2">
-                                    <label class="col-form-label">Login</label>
-                                    <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
-                                </div>
-                                <div class="mb-3 d-flex justify-content-between gap-2">
-                                    <label class="col-form-label">Email</label>
-                                    <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
-                                </div>
-                                <div class="mb-3 d-flex justify-content-between gap-2">
-                                    <label class="col-form-label">NickName</label>
-                                    <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
-                                </div>
-                                <div class="mb-3 d-flex justify-content-between gap-2">
-                                    <label class="col-form-label">Password</label>
-                                    <input type="password" class="form-control w-75" maxlength="35" placeholder="Enter password here"></input> 
-                                </div>
-                                <div class="mb-3 d-flex justify-content-between gap-2">
-                                    <label class="col-form-label">Repeat password</label>
-                                    <input type="password" class="form-control w-75" maxlength="35" placeholder="Repeat password here"></input> 
-                                </div>
-                                <div class="mb-3 d-flex justify-content-between gap-2">
-                                    <label class="col-form-label">Upload avatar</label>
-                                    <div class="avatar-selection-block w-75">
-                                        <input class="form-control w-100" type="file"></input>
-                                    </div>
-                                </div>
-                                <div class="mb-3 d-flex justify-content-end">
-                                    <button class="mt-2 btn btn-outline-success w-75">Log in</button>    
-                                </div>
-                            </form>
-                        </div>
-                    </section>
-                </div>
-            </main>
-
-            <div class="col-3">
-                <aside>
-                    <section class="mb-3 mt-5">
-                        <h3>Popular tags</h3>
-                        <div>
-                            <span class="badge text-bg-primary">Perl</span>
-                            <span class="badge text-bg-secondary">Python</span>
-                            <span class="badge text-bg-success">MySql</span>
-                            <span class="badge text-bg-danger">TechnoPark</span>
-                            <span class="badge text-bg-warning">django</span>
-                            <span class="badge text-bg-info">Mail.ru</span>
-                            <span class="badge text-bg-light">Light</span>
-                        </div>
-                    </section>
-            
-                    <section>
-                        <h3>Best members</h3>
-                        <div>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Mr. Freeman</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Dr. House</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Bender</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Queen Victoria</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">A Gusev</a>
-                        </div>
-                    </section>
-            
-                </aside>
-            </div>
+        <div class="mb-3 d-flex justify-content-end">
+            <button class="mt-2 btn btn-outline-success w-75">Register</button>
         </div>
-    </div>
-        
-    <script src="js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    </form>
+</div>
+{% endblock %}

@@ -22,13 +22,13 @@
         <div class="col d-flex flex-column justify-content-between">
             <div>
                 <h5 class="card-title">
-                    <a class="link-light link-underline-opacity-0" href="/question.html">{{ question.title }}</a>
+                    <a class="link-light link-underline-opacity-0" href="{% url "single_question" %}">{{ question.title }}</a>
                 </h5>
                 <p class="card-text">{{ question.text }}</p>
             </div>
             <div class="row">
                 <div class="col">
-                    <a class="btn btn-outline-primary" href="question.html">Answers (3)</a>
+                    <a class="btn btn-outline-primary" href="{% url "single_question" %}">Answers (3)</a>
                 </div>
                 <div class="col">
                     <span>Tags:</span>
