@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block content %}
     <div class="mb-4 mt-3">
@@ -23,7 +23,7 @@
                 <label class="col-form-label">Upload avatar</label>
                 <div class="avatar-selection-block w-75">
                     <div class="upload-user-image">
-                        <img src="{% static "img/placeholder.png" %}">
+                        <img src="{{ MEDIA_URL }}/placeholder.png" alt="">
                     </div>
                     <input class="form-control w-75" type="file">
                 </div>
