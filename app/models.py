@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
 
         Profile.objects.create(
             user=user,
-            avatar='avatars/_placeholder.png'
+            avatar='placeholder.png'
         )
         return user
 
@@ -74,12 +74,6 @@ class AnswerManager(models.Manager):
             question=question,
             content=content
         )
-
-    def for_question(self, question_id):
-        return self.filter(question_id=question_id).annotate(
-            rating=Count('answerlike', filter=models.Q(answerlike__is_positive=True)) -
-                   Count('answerlike', filter=models.Q(answerlike__is_positive=False))
-        ).order_by('-rating', '-created_at')
 
     def for_question(self, question_id):
         return self.filter(question_id=question_id).annotate(

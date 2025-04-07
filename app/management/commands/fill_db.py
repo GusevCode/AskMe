@@ -25,11 +25,11 @@ def get_random_avatar():
 
 
 BOOTSTRAP_COLORS = ["primary", "secondary", "success", "danger", "warning", "info"]
-BATCH_SIZE = 1000  # Оптимальный размер пакета для bulk операций
+BATCH_SIZE = 1000
 
 
 class Command(BaseCommand):
-    help = "Очищает БД (без удаления админа) и заполняет тестовыми данными"
+    help = "Очищает БД и заполняет тестовыми данными"
 
     def add_arguments(self, parser):
         parser.add_argument('ratio', type=int, help='Коэффициент заполнения сущностей')
@@ -45,7 +45,6 @@ class Command(BaseCommand):
         ratio = kwargs['ratio']
         fake = Faker()
 
-        # Оптимизированная очистка базы
         self.stdout.write("Очищаем базу данных...")
         with transaction.atomic():
             QuestionLike.objects.all().delete()
