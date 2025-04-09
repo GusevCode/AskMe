@@ -131,7 +131,6 @@ class Question(models.Model):
         return self.answer_set.count()
 
 
-
 class Answer(models.Model):
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)

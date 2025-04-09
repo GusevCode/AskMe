@@ -25,11 +25,11 @@ def get_random_avatar():
 
 
 BOOTSTRAP_COLORS = ["primary", "secondary", "success", "danger", "warning", "info"]
-BATCH_SIZE = 1000
+BATCH_SIZE = 2000
 
 
 class Command(BaseCommand):
-    help = "Очищает БД и заполняет тестовыми данными"
+    help = "Заполняет тестовыми данными"
 
     def add_arguments(self, parser):
         parser.add_argument('ratio', type=int, help='Коэффициент заполнения сущностей')
@@ -45,22 +45,13 @@ class Command(BaseCommand):
         ratio = kwargs['ratio']
         fake = Faker()
 
-        self.stdout.write("Очищаем базу данных...")
-        with transaction.atomic():
-            QuestionLike.objects.all().delete()
-            AnswerLike.objects.all().delete()
-            Answer.objects.all().delete()
-            Question.tags.through.objects.all().delete()  # Очищаем связи many-to-many
-            Question.objects.all().delete()
-            Tag.objects.all().delete()
-            Profile.objects.exclude(user__is_superuser=True).delete()
-            User.objects.filter(is_superuser=False).delete()
-
         num_users = ratio
         num_questions = ratio * 10
         num_answers = ratio * 100
         num_tags = ratio
         num_ratings = ratio * 200
+
+        ent_num = 1
 
         # Создание пользователей и профилей
         self.stdout.write(f"Создаётся {num_users} пользователей...")
@@ -68,14 +59,16 @@ class Command(BaseCommand):
         profile_objs = []
         for i in range(1, num_users + 1):
             user = User(
-                username=fake.user_name() + str(i),
+                username=fake.user_name() + str(i) + str(ent_num),
                 email=fake.email(),
             )
+            ent_num += 1
             user.set_password('password')
             user_objs.append(user)
             self.print_progress(i, num_users, "пользователей")
 
             profile_objs.append(Profile(user=user, avatar=get_random_avatar()))
+            ent_num += 1
 
             if i % BATCH_SIZE == 0 or i == num_users:
                 User.objects.bulk_create(user_objs)
@@ -90,10 +83,11 @@ class Command(BaseCommand):
         tag_objs = []
         for i in range(1, num_tags + 1):
             tag_objs.append(Tag(
-                name=fake.word() + str(i),
+                name=fake.word() + str(i) + str(ent_num),
                 color_class=random.choice(BOOTSTRAP_COLORS),
                 description=fake.text(max_nb_chars=50)
             ))
+            ent_num += 1
             self.print_progress(i, num_tags, "тегов")
             if i % BATCH_SIZE == 0 or i == num_tags:
                 Tag.objects.bulk_create(tag_objs)
@@ -172,4 +166,4 @@ class Command(BaseCommand):
                 ql_objs = []
                 al_objs = []
 
-        self.stdout.write(self.style.SUCCESS("\nБаза успешно очищена и заполнена тестовыми данными!"))
+        self.stdout.write(self.style.SUCCESS("\nБаза данных заполнена тестовыми данными!"))
