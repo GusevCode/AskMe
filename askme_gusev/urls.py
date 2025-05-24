@@ -31,6 +31,12 @@ urlpatterns = [
     path('question/<int:question_id>', views.single_question, name="single_question"),
     path('hot/', views.hot, name="hot"),
     path('tag/<tag_name>', views.tag, name="tag"),
+    
+    # AJAX views
+    path('ajax/vote-question/', views.vote_question, name='vote_question'),
+    path('ajax/vote-answer/', views.vote_answer, name='vote_answer'),
+    path('ajax/mark-correct/', views.mark_correct_answer, name='mark_correct_answer'),
+    
     path('admin/', admin.site.urls),
 ]
 

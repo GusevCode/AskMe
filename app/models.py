@@ -116,6 +116,15 @@ class Question(models.Model):
 
     def answer_count(self):
         return self.answer_set.count()
+    
+    def get_user_vote(self, user):
+        if not user.is_authenticated:
+            return None
+        
+        vote = self.questionlike_set.filter(user=user).first()
+        if vote:
+            return 'like' if vote.is_positive else 'dislike'
+        return None
 
 
 class Answer(models.Model):
@@ -132,6 +141,15 @@ class Answer(models.Model):
 
     def total_likes(self):
         return self.answerlike_set.filter(is_positive=True).count() - self.answerlike_set.filter(is_positive=False).count()
+    
+    def get_user_vote(self, user):
+        if not user.is_authenticated:
+            return None
+        
+        vote = self.answerlike_set.filter(user=user).first()
+        if vote:
+            return 'like' if vote.is_positive else 'dislike'
+        return None
 
     class Meta:
         ordering = ['-is_correct', '-created_at']
