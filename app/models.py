@@ -7,8 +7,6 @@ from django.dispatch import receiver
 
 from askme_gusev import settings
 
-# Managers
-
 class TagManager(models.Manager):
     def get_or_create_by_name(self, name):
         try:
@@ -39,9 +37,28 @@ class QuestionManager(models.Manager):
         ).prefetch_related('tags').order_by('-created_at')
 
     def best_questions(self):
-        return self.filter(is_active=True).select_related(
+        return self.filter(
+            is_active=True
+        ).select_related(
             'author', 'author__profile'
-        ).prefetch_related('tags').order_by('-created_at')[:50]
+        ).prefetch_related('tags').annotate(
+            rating_score=Count(
+                'questionlike', 
+                filter=models.Q(questionlike__is_positive=True)
+            ) - Count(
+                'questionlike', 
+                filter=models.Q(questionlike__is_positive=False)
+            ),
+            has_correct_answer=Count(
+                'answer', 
+                filter=models.Q(answer__is_correct=True)
+            )
+        ).filter(
+            has_correct_answer=0
+        ).order_by(
+            '-rating_score',
+            '-created_at'
+        )[:50]
 
     def with_tag(self, tag_name):
         return self.filter(
@@ -79,9 +96,6 @@ class ProfileManager(models.Manager):
         return self.select_related('user').filter(
             user__question__isnull=False
         ).distinct().order_by('-user__date_joined')[:count]
-
-
-# Create your models here.
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -152,6 +166,14 @@ class Question(models.Model):
 
     def answer_count(self):
         return self.answer_set.count()
+    
+    def is_solved(self):
+        return self.answer_set.filter(is_correct=True).exists()
+    
+    def get_rating_score(self):
+        if hasattr(self, 'rating_score'):
+            return self.rating_score
+        return self.rating()
     
     def get_user_vote(self, user):
         if not user.is_authenticated:

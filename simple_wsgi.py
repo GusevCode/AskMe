@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Простое WSGI приложение для демонстрации работы с параметрами
-Запускается на localhost:8081 с помощью gunicorn
-"""
 
 import urllib.parse
 from io import StringIO
@@ -11,27 +7,19 @@ import sys
 
 
 def application(environ, start_response):
-    """
-    Основная WSGI функция приложения
-    """
-    # Получаем метод запроса
     method = environ.get('REQUEST_METHOD', 'GET')
-    
-    # Получаем GET параметры
+
     query_string = environ.get('QUERY_STRING', '')
     get_params = urllib.parse.parse_qs(query_string)
-    
-    # Получаем POST параметры
+
     post_params = {}
     if method == 'POST':
         try:
-            # Получаем размер тела запроса
             content_length = int(environ.get('CONTENT_LENGTH', 0))
         except (ValueError, TypeError):
             content_length = 0
         
         if content_length > 0:
-            # Читаем тело запроса
             post_data = environ['wsgi.input'].read(content_length)
             if isinstance(post_data, bytes):
                 post_data = post_data.decode('utf-8')
@@ -131,8 +119,7 @@ def application(environ, start_response):
     </body>
     </html>
     """
-    
-    # Устанавливаем заголовки ответа
+
     status = '200 OK'
     response_headers = [
         ('Content-Type', 'text/html; charset=utf-8'),
@@ -140,15 +127,11 @@ def application(environ, start_response):
     ]
     
     start_response(status, response_headers)
-    
-    # Возвращаем содержимое как байты
+
     return [html_content.encode('utf-8')]
 
 
 def format_params(params_dict):
-    """
-    Форматирует словарь параметров в HTML список
-    """
     if not params_dict:
         return "<p><em>Параметры отсутствуют</em></p>"
     
@@ -161,7 +144,6 @@ def format_params(params_dict):
 
 
 if __name__ == "__main__":
-    # Для локального тестирования
     from wsgiref.simple_server import make_server
     
     print("Запуск тестового WSGI сервера на http://localhost:8081")

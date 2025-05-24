@@ -22,7 +22,7 @@ def base_context():
     if popular_tags is None:
         try:
             popular_tags = list(Tag.objects.popular_tags(10))
-            cache.set('popular_tags', popular_tags, 60 * 30)  # 30 минут
+            cache.set('popular_tags', popular_tags, 60 * 30)  # 30 minutes
         except Exception as e:
             print(f"Error loading popular tags: {e}")
             popular_tags = []
@@ -31,7 +31,7 @@ def base_context():
     if best_users is None:
         try:
             best_users = list(Profile.objects.best_users(5))
-            cache.set('best_users', best_users, 60 * 15)  # 15 минут
+            cache.set('best_users', best_users, 60 * 15)  # 15 minutes
         except Exception as e:
             print(f"Error loading best users, trying alternative: {e}")
             try:
@@ -82,14 +82,14 @@ def ask(request):
         
         if form.is_valid():
             question = form.save(author=request.user)
-            messages.success(request, f'Вопрос "{question.title}" успешно добавлен!')
+            messages.success(request, f'Question "{question.title}" has been successfully created!')
             print(f"Question '{question.title}' created by user {request.user.username}")
 
             cache.delete('popular_tags')
             
             return redirect('single_question', question_id=question.id)
         else:
-            messages.error(request, 'Вопрос не был добавлен. Пожалуйста, исправьте ошибки в форме.')
+            messages.error(request, 'Question was not created. Please fix the errors in the form.')
             print(f"Question creation error: {form.errors}")
             
         context['form'] = form
@@ -109,7 +109,7 @@ def login(request):
             username = form.cleaned_data['username']
             
             auth.login(request, user)
-            messages.success(request, f'Добро пожаловать, {username}!')
+            messages.success(request, f'Welcome back, {username}!')
             print(f"User {username} successfully logged in")
 
             continue_url = (request.POST.get('continue') or 
@@ -121,7 +121,7 @@ def login(request):
             else:
                 return redirect('index')
         else:
-            messages.error(request, 'Ошибка входа. Проверьте имя пользователя и пароль.')
+            messages.error(request, 'Login failed. Please check your username and password.')
             print(f"Login error: {form.non_field_errors()}")
             
         context['form'] = form
@@ -141,13 +141,13 @@ def register(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data['username']
-            messages.success(request, f'Регистрация прошла успешно! Добро пожаловать, {username}!')
+            messages.success(request, f'Registration successful! Welcome, {username}!')
             print(f"User {username} successfully registered")
 
             auth.login(request, user)
             return redirect('index')
         else:
-            messages.error(request, 'Ошибка регистрации. Пожалуйста, исправьте ошибки в форме.')
+            messages.error(request, 'Registration failed. Please fix the errors in the form.')
             print(f"Registration error: {form.errors}")
             
         context['form'] = form
@@ -182,14 +182,14 @@ def single_question(request, question_id):
             
             if form.is_valid():
                 answer = form.save(author=request.user, question=question)
-                messages.success(request, 'Ответ успешно добавлен!')
+                messages.success(request, 'Answer has been successfully added!')
                 print(f"Answer added by user {request.user.username} to question {question.title}")
 
                 cache.delete('hot_questions')
                 
                 return redirect(f'/question/{question_id}#{answer.id}')
             else:
-                messages.error(request, 'Ответ не был добавлен. Пожалуйста, исправьте ошибки в форме.')
+                messages.error(request, 'Answer was not added. Please fix the errors in the form.')
                 print(f"Answer creation error: {form.errors}")
                 
             context['answer_form'] = form
@@ -203,12 +203,23 @@ def hot(request):
     if hot_questions is None:
         try:
             hot_questions = list(Question.objects.best_questions())
-            cache.set('hot_questions', hot_questions, 60 * 10)  # 10 минут
+            cache.set('hot_questions', hot_questions, 60 * 10)  # 10 minutes
+            print(f"Loaded {len(hot_questions)} hot questions with rating logic")
         except Exception as e:
             print(f"Error loading hot questions: {e}")
-            # Fallback - просто новые вопросы
-            hot_questions = list(Question.objects.get_all()[:50])
-            cache.set('hot_questions', hot_questions, 60 * 5)  # На 5 минут для fallback
+            try:
+                hot_questions = list(Question.objects.filter(
+                    is_active=True
+                ).exclude(
+                    answer__is_correct=True
+                ).select_related('author', 'author__profile').prefetch_related('tags').order_by('-created_at')[:50])
+                cache.set('hot_questions', hot_questions, 60 * 5)
+                print(f"Fallback: loaded {len(hot_questions)} unsolved questions")
+            except Exception as e2:
+                print(f"Error loading fallback hot questions: {e2}")
+                hot_questions = list(Question.objects.get_all()[:50])
+                cache.set('hot_questions', hot_questions, 60 * 2)
+                print(f"Final fallback: loaded {len(hot_questions)} new questions")
     
     page = paginate(hot_questions, request)
     context = base_context()
@@ -237,9 +248,9 @@ def tag(request, tag_name):
     return render(request, 'tag.html', context=context)
 
 def logout(request):
-    username = request.user.username if request.user.is_authenticated else "пользователь"
+    username = request.user.username if request.user.is_authenticated else "user"
     auth.logout(request)
-    messages.info(request, f'До свидания, {username}!')
+    messages.info(request, f'Goodbye, {username}!')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
@@ -256,11 +267,11 @@ def profile_edit(request):
         
         if form.is_valid():
             form.save()
-            messages.success(request, 'Профиль успешно обновлен!')
+            messages.success(request, 'Profile has been successfully updated!')
             print(f"Profile for user {request.user.username} updated")
             return redirect('profile_edit')
         else:
-            messages.error(request, 'Ошибка обновления профиля. Пожалуйста, исправьте ошибки в форме.')
+            messages.error(request, 'Profile update failed. Please fix the errors in the form.')
             print(f"Profile update error: {form.errors}")
             
         context['form'] = form
@@ -304,6 +315,8 @@ def vote_question(request):
             )
 
         new_rating = question.rating()
+
+        cache.delete('hot_questions')
         
         return JsonResponse({
             'success': True,
@@ -379,6 +392,8 @@ def mark_correct_answer(request):
 
         answer.is_correct = not answer.is_correct
         answer.save()
+
+        cache.delete('hot_questions')
         
         return JsonResponse({
             'success': True,

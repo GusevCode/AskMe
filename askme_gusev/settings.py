@@ -127,7 +127,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Для production и тестирования
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -140,7 +140,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'askme-cache',
-        'TIMEOUT': 60 * 30,  # 30 минут по умолчанию
+        'TIMEOUT': 60 * 30,
         'OPTIONS': {
             'MAX_ENTRIES': 1000,
         }

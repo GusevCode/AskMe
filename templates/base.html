@@ -18,18 +18,18 @@
             <div class="toast-header">
                 {% if message.tags == 'success' %}
                     <div class="rounded me-2 bg-success" style="width: 20px; height: 20px;"></div>
-                    <strong class="me-auto">Успех</strong>
+                    <strong class="me-auto">Success</strong>
                 {% elif message.tags == 'error' %}
                     <div class="rounded me-2 bg-danger" style="width: 20px; height: 20px;"></div>
-                    <strong class="me-auto">Ошибка</strong>
+                    <strong class="me-auto">Error</strong>
                 {% elif message.tags == 'warning' %}
                     <div class="rounded me-2 bg-warning" style="width: 20px; height: 20px;"></div>
-                    <strong class="me-auto">Предупреждение</strong>
+                    <strong class="me-auto">Warning</strong>
                 {% else %}
                     <div class="rounded me-2 bg-info" style="width: 20px; height: 20px;"></div>
-                    <strong class="me-auto">Информация</strong>
+                    <strong class="me-auto">Info</strong>
                 {% endif %}
-                <small class="text-muted">только что</small>
+                <small class="text-muted">just now</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
@@ -124,10 +124,10 @@
                                         <img src="{{ profile.get_avatar_url }}" class="rounded-circle me-2" style="width: 30px; height: 30px;" alt="User avatar">
                                         <span class="text-light">{{ profile.user.username }}</span>
                                     </div>
-                                    <small class="badge bg-primary">{{ profile.question_count }} вопр.</small>
+                                    <small class="badge bg-primary">{{ profile.question_count }} questions</small>
                                 </div>
                             {% empty %}
-                                <div class="text-muted">Пока нет активных пользователей</div>
+                                <div class="text-muted">No active users yet</div>
                             {% endfor %}
                         </div>
                     </section>
