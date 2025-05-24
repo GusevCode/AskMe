@@ -1,7 +1,8 @@
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.core.cache import cache
 from app.models import Profile
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -14,12 +15,36 @@ from askme_gusev import settings
 
 # Create your views here.
 
-BOOTSTRAP_COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark",]
+BOOTSTRAP_COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
 
 def base_context():
+    popular_tags = cache.get('popular_tags')
+    if popular_tags is None:
+        try:
+            popular_tags = list(Tag.objects.popular_tags(10))
+            cache.set('popular_tags', popular_tags, 60 * 30)  # 30 минут
+        except Exception as e:
+            print(f"Error loading popular tags: {e}")
+            popular_tags = []
+
+    best_users = cache.get('best_users')
+    if best_users is None:
+        try:
+            best_users = list(Profile.objects.best_users(5))
+            cache.set('best_users', best_users, 60 * 15)  # 15 минут
+        except Exception as e:
+            print(f"Error loading best users, trying alternative: {e}")
+            try:
+                best_users = list(Profile.objects.best_users_by_activity(5))
+                cache.set('best_users', best_users, 60 * 15)
+            except Exception as e2:
+                print(f"Error loading best users alternative: {e2}")
+                best_users = []
+    
     return {
         'MEDIA_URL': settings.MEDIA_URL,
-        'popular_tags': Tag.objects.popular_tags(10),
+        'popular_tags': popular_tags,
+        'best_users': best_users,
         'bootstrap_colors': BOOTSTRAP_COLORS
     }
 
@@ -33,6 +58,7 @@ def paginate(objects_list, request, per_page=5):
     except EmptyPage:
         page = paginator.page(paginator.num_pages)
     return page
+
 def index(request):
     questions = Question.objects.get_all()
     page = paginate(questions, request)
@@ -56,9 +82,14 @@ def ask(request):
         
         if form.is_valid():
             question = form.save(author=request.user)
+            messages.success(request, f'Вопрос "{question.title}" успешно добавлен!')
             print(f"Question '{question.title}' created by user {request.user.username}")
+
+            cache.delete('popular_tags')
+            
             return redirect('single_question', question_id=question.id)
         else:
+            messages.error(request, 'Вопрос не был добавлен. Пожалуйста, исправьте ошибки в форме.')
             print(f"Question creation error: {form.errors}")
             
         context['form'] = form
@@ -78,6 +109,7 @@ def login(request):
             username = form.cleaned_data['username']
             
             auth.login(request, user)
+            messages.success(request, f'Добро пожаловать, {username}!')
             print(f"User {username} successfully logged in")
 
             continue_url = (request.POST.get('continue') or 
@@ -87,8 +119,9 @@ def login(request):
             if continue_url:
                 return redirect(continue_url)
             else:
-                return redirect('profile_edit')
+                return redirect('index')
         else:
+            messages.error(request, 'Ошибка входа. Проверьте имя пользователя и пароль.')
             print(f"Login error: {form.non_field_errors()}")
             
         context['form'] = form
@@ -108,11 +141,13 @@ def register(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data['username']
+            messages.success(request, f'Регистрация прошла успешно! Добро пожаловать, {username}!')
             print(f"User {username} successfully registered")
 
             auth.login(request, user)
             return redirect('index')
         else:
+            messages.error(request, 'Ошибка регистрации. Пожалуйста, исправьте ошибки в форме.')
             print(f"Registration error: {form.errors}")
             
         context['form'] = form
@@ -147,10 +182,14 @@ def single_question(request, question_id):
             
             if form.is_valid():
                 answer = form.save(author=request.user, question=question)
+                messages.success(request, 'Ответ успешно добавлен!')
                 print(f"Answer added by user {request.user.username} to question {question.title}")
+
+                cache.delete('hot_questions')
                 
                 return redirect(f'/question/{question_id}#{answer.id}')
             else:
+                messages.error(request, 'Ответ не был добавлен. Пожалуйста, исправьте ошибки в форме.')
                 print(f"Answer creation error: {form.errors}")
                 
             context['answer_form'] = form
@@ -160,9 +199,18 @@ def single_question(request, question_id):
     return render(request, 'single_question.html', context=context)
 
 def hot(request):
-    tags = Tag.objects.popular_tags()
-    questions = Question.objects.best_questions()
-    page = paginate(questions, request)
+    hot_questions = cache.get('hot_questions')
+    if hot_questions is None:
+        try:
+            hot_questions = list(Question.objects.best_questions())
+            cache.set('hot_questions', hot_questions, 60 * 10)  # 10 минут
+        except Exception as e:
+            print(f"Error loading hot questions: {e}")
+            # Fallback - просто новые вопросы
+            hot_questions = list(Question.objects.get_all()[:50])
+            cache.set('hot_questions', hot_questions, 60 * 5)  # На 5 минут для fallback
+    
+    page = paginate(hot_questions, request)
     context = base_context()
     context.update({'questions': page.object_list, 'page_obj': page})
 
@@ -175,7 +223,6 @@ def hot(request):
     return render(request, 'hot.html', context=context)
 
 def tag(request, tag_name):
-    tags = Tag.objects.popular_tags()
     questions = Question.objects.with_tag(tag_name)
     page = paginate(questions, request)
     context = base_context()
@@ -190,7 +237,9 @@ def tag(request, tag_name):
     return render(request, 'tag.html', context=context)
 
 def logout(request):
+    username = request.user.username if request.user.is_authenticated else "пользователь"
     auth.logout(request)
+    messages.info(request, f'До свидания, {username}!')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
@@ -207,16 +256,17 @@ def profile_edit(request):
         
         if form.is_valid():
             form.save()
+            messages.success(request, 'Профиль успешно обновлен!')
             print(f"Profile for user {request.user.username} updated")
             return redirect('profile_edit')
         else:
+            messages.error(request, 'Ошибка обновления профиля. Пожалуйста, исправьте ошибки в форме.')
             print(f"Profile update error: {form.errors}")
             
         context['form'] = form
     else:
         context['form'] = ProfileEditForm(instance=profile, user=request.user)
-    
-    # Добавляем профиль в контекст для отображения текущего аватара
+
     context['profile'] = profile
     
     return render(request, 'profile_edit.html', context=context)

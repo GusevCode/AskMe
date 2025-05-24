@@ -10,6 +10,36 @@
     <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" />
 </head>
 <body>
+    <!-- Toast контейнер для уведомлений -->
+    {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        {% for message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+            <div class="toast-header">
+                {% if message.tags == 'success' %}
+                    <div class="rounded me-2 bg-success" style="width: 20px; height: 20px;"></div>
+                    <strong class="me-auto">Успех</strong>
+                {% elif message.tags == 'error' %}
+                    <div class="rounded me-2 bg-danger" style="width: 20px; height: 20px;"></div>
+                    <strong class="me-auto">Ошибка</strong>
+                {% elif message.tags == 'warning' %}
+                    <div class="rounded me-2 bg-warning" style="width: 20px; height: 20px;"></div>
+                    <strong class="me-auto">Предупреждение</strong>
+                {% else %}
+                    <div class="rounded me-2 bg-info" style="width: 20px; height: 20px;"></div>
+                    <strong class="me-auto">Информация</strong>
+                {% endif %}
+                <small class="text-muted">только что</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="d-flex flex-column min-vh-100">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container">
@@ -77,7 +107,10 @@
                         <h3>Popular tags</h3>
                         <div>
                             {% for tag in popular_tags %}
-                                <span class="badge rounded-pill text-bg-{{ tag.color_class }}"><a class="" style="color: unset;text-decoration: unset;" href="{% url "tag" tag.name %}">{{ tag.name }}</a></span>
+                                <span class="badge rounded-pill text-bg-{{ tag.color_class }} me-1 mb-1 d-inline-flex align-items-center">
+                                    <a class="" style="color: unset;text-decoration: unset;" href="{% url "tag" tag.name %}">{{ tag.name }}</a>
+                                    <small class="ms-1 opacity-75">({{ tag.questions_count }})</small>
+                                </span>
                             {% endfor %}
                         </div>
                     </section>
@@ -85,11 +118,17 @@
                     <section>
                         <h3>Best members</h3>
                         <div>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Mr. Smith</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Dr. House</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Bender</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">Queen Victoria</a>
-                            <a class="d-block btn btn-outline-secondary mt-2" href="#">A Gusev</a>
+                            {% for profile in best_users %}
+                                <div class="d-flex align-items-center justify-content-between mt-2 p-2 bg-dark rounded">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ profile.get_avatar_url }}" class="rounded-circle me-2" style="width: 30px; height: 30px;" alt="User avatar">
+                                        <span class="text-light">{{ profile.user.username }}</span>
+                                    </div>
+                                    <small class="badge bg-primary">{{ profile.question_count }} вопр.</small>
+                                </div>
+                            {% empty %}
+                                <div class="text-muted">Пока нет активных пользователей</div>
+                            {% endfor %}
                         </div>
                     </section>
 
@@ -110,5 +149,18 @@
     <script src="{% static "js/bootstrap.bundle.min.js" %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static "js/ajax.js" %}"></script>
+    
+    <!-- Auto-hide toasts after 5 seconds -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl, {
+                    autohide: true,
+                    delay: 5000
+                });
+            });
+        });
+    </script>
 </body>
 </html>

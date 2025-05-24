@@ -1,13 +1,27 @@
 #!/bin/bash
 
-# Скрипт для запуска серверов для тестирования производительности
-
 echo "🚀 Запуск серверов для тестирования производительности..."
 
-# Активируем виртуальное окружение
 source venv/bin/activate
 
-# Функция для остановки всех процессов при завершении
+echo "🛑 Остановка старых процессов..."
+
+sudo fuser -k 80/tcp 2>/dev/null || true
+sudo fuser -k 8000/tcp 2>/dev/null || true  
+sudo fuser -k 8081/tcp 2>/dev/null || true
+
+sudo pkill -9 -f nginx 2>/dev/null || true
+
+sudo pkill -9 -f "gunicorn.*askme_gusev" 2>/dev/null || true
+sudo pkill -9 -f "gunicorn.*simple_wsgi" 2>/dev/null || true
+sudo pkill -9 -f "gunicorn" 2>/dev/null || true
+
+sudo rm -f /tmp/gunicorn.pid /tmp/gunicorn_simple.pid 2>/dev/null || true
+
+sleep 3
+
+echo "✅ Старые процессы остановлены"
+
 cleanup() {
     echo "🛑 Остановка всех серверов..."
     pkill -f "gunicorn"
@@ -15,26 +29,20 @@ cleanup() {
     exit 0
 }
 
-# Настраиваем обработку сигналов
 trap cleanup SIGINT SIGTERM
 
-# Создаем директорию для кэша nginx
 sudo mkdir -p /tmp/nginx_cache
 sudo chmod 777 /tmp/nginx_cache
 
-# 1. Запуск Django приложения через gunicorn на порту 8000
 echo "📦 Запуск Django приложения через gunicorn (порт 8000)..."
 gunicorn -c gunicorn.conf.py askme_gusev.wsgi &
 DJANGO_PID=$!
 
-# 2. Запуск простого WSGI приложения через gunicorn на порту 8081  
 echo "📦 Запуск простого WSGI приложения через gunicorn (порт 8081)..."
 gunicorn -c gunicorn_simple.conf.py simple_wsgi:application &
 SIMPLE_PID=$!
 
-# 3. Запуск nginx с нашей конфигурацией
 echo "🌐 Запуск nginx..."
-# Проверяем конфигурацию
 sudo nginx -t -c $(pwd)/askme_gusev.nginx.conf
 
 if [ $? -eq 0 ]; then
@@ -52,5 +60,4 @@ echo "📊 Nginx proxy: http://localhost"
 echo ""
 echo "Нажмите Ctrl+C для остановки всех серверов"
 
-# Ждем сигнала завершения
 wait 

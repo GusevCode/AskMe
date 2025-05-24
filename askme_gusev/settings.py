@@ -135,6 +135,18 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app/uploads')
 MEDIA_URL = '/uploads/'
 
+# Кэширование
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'askme-cache',
+        'TIMEOUT': 60 * 30,  # 30 минут по умолчанию
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+        }
+    }
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

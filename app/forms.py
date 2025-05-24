@@ -103,7 +103,6 @@ class RegisterForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
-            # Profile создастся автоматически через UserManager
         return user
 
 
@@ -158,8 +157,7 @@ class ProfileEditForm(forms.ModelForm):
 
     def save(self, commit=True):
         profile = super().save(commit=False)
-        
-        # Обновляем данные пользователя
+
         if self.user:
             self.user.username = self.cleaned_data['username']
             self.user.email = self.cleaned_data['email']

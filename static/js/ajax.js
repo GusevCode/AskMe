@@ -13,6 +13,60 @@ $(document).ready(function() {
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
 
+    // Функция для показа Toast уведомлений
+    function showToast(message, type = 'info') {
+        const toastContainer = $('.toast-container');
+        if (toastContainer.length === 0) {
+            $('body').append('<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>');
+        }
+        
+        let iconColor = 'info';
+        let title = 'Уведомление';
+        
+        switch(type) {
+            case 'success':
+                iconColor = 'success';
+                title = 'Успех';
+                break;
+            case 'error':
+                iconColor = 'danger';
+                title = 'Ошибка';
+                break;
+            case 'warning':
+                iconColor = 'warning';
+                title = 'Предупреждение';
+                break;
+        }
+        
+        const toastHtml = `
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                <div class="toast-header">
+                    <div class="rounded me-2 bg-${iconColor}" style="width: 20px; height: 20px;"></div>
+                    <strong class="me-auto">${title}</strong>
+                    <small class="text-muted">только что</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>
+        `;
+        
+        const $toast = $(toastHtml);
+        $('.toast-container').append($toast);
+        
+        const toast = new bootstrap.Toast($toast[0], {
+            autohide: true,
+            delay: 5000
+        });
+        toast.show();
+        
+        // Удаляем toast из DOM после скрытия
+        $toast[0].addEventListener('hidden.bs.toast', function() {
+            $toast.remove();
+        });
+    }
+
     $('.vote-btn').click(function(e) {
         e.preventDefault();
         
@@ -46,15 +100,19 @@ $(document).ready(function() {
                     if (!wasActive) {
                         if (voteType === 'like') {
                             button.removeClass('btn-outline-success').addClass('btn-success');
+                            showToast('Вы поставили лайк!', 'success');
                         } else if (voteType === 'dislike') {
                             button.removeClass('btn-outline-danger').addClass('btn-danger');
+                            showToast('Вы поставили дизлайк!', 'info');
                         }
+                    } else {
+                        showToast('Голос отменен', 'info');
                     }
                 }
             },
             error: function(xhr) {
                 console.error('Vote error:', xhr.responseJSON);
-                alert('Error voting. Please try again.');
+                showToast('Ошибка голосования. Попробуйте снова.', 'error');
             },
             complete: function() {
                 button.prop('disabled', false);
@@ -95,18 +153,21 @@ $(document).ready(function() {
                     if (!wasActive) {
                         if (voteType === 'like') {
                             button.removeClass('btn-outline-success').addClass('btn-success');
+                            showToast('Вы поставили лайк ответу!', 'success');
                         } else if (voteType === 'dislike') {
                             button.removeClass('btn-outline-danger').addClass('btn-danger');
+                            showToast('Вы поставили дизлайк ответу!', 'info');
                         }
+                    } else {
+                        showToast('Голос за ответ отменен', 'info');
                     }
                 }
             },
             error: function(xhr) {
                 console.error('Vote error:', xhr.responseJSON);
-                alert('Error voting. Please try again.');
+                showToast('Ошибка голосования за ответ. Попробуйте снова.', 'error');
             },
             complete: function() {
-                // Разблокируем кнопку
                 button.prop('disabled', false);
             }
         });
@@ -116,7 +177,6 @@ $(document).ready(function() {
         const checkbox = $(this);
         const answerId = checkbox.data('answer-id');
         
-        // Блокируем чекбокс на время запроса
         checkbox.prop('disabled', true);
         
         $.ajax({
@@ -130,6 +190,9 @@ $(document).ready(function() {
                 if (response.success) {
                     if (response.is_correct) {
                         $('.correct-answer-checkbox').not(checkbox).prop('checked', false);
+                        showToast('Ответ отмечен как правильный!', 'success');
+                    } else {
+                        showToast('Отметка правильного ответа снята', 'info');
                     }
 
                     checkbox.prop('checked', response.is_correct);
@@ -137,7 +200,7 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 console.error('Mark correct error:', xhr.responseJSON);
-                alert('Error marking answer. Please try again.');
+                showToast('Ошибка отметки ответа. Попробуйте снова.', 'error');
                 checkbox.prop('checked', !checkbox.prop('checked'));
             },
             complete: function() {
