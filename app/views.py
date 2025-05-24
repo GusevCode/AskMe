@@ -8,6 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
+from django.db.models import Q
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+import requests
+import json
+from django.utils import timezone
+from django.template.loader import render_to_string
 
 from app.forms import LoginForm, RegisterForm, ProfileEditForm, QuestionForm, AnswerForm
 from app.models import Question, Answer, Tag, QuestionLike, AnswerLike
@@ -18,33 +24,8 @@ from askme_gusev import settings
 BOOTSTRAP_COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
 
 def base_context():
-    popular_tags = cache.get('popular_tags')
-    if popular_tags is None:
-        try:
-            popular_tags = list(Tag.objects.popular_tags(10))
-            cache.set('popular_tags', popular_tags, 60 * 30)  # 30 minutes
-        except Exception as e:
-            print(f"Error loading popular tags: {e}")
-            popular_tags = []
-
-    best_users = cache.get('best_users')
-    if best_users is None:
-        try:
-            best_users = list(Profile.objects.best_users(5))
-            cache.set('best_users', best_users, 60 * 15)  # 15 minutes
-        except Exception as e:
-            print(f"Error loading best users, trying alternative: {e}")
-            try:
-                best_users = list(Profile.objects.best_users_by_activity(5))
-                cache.set('best_users', best_users, 60 * 15)
-            except Exception as e2:
-                print(f"Error loading best users alternative: {e2}")
-                best_users = []
-    
     return {
         'MEDIA_URL': settings.MEDIA_URL,
-        'popular_tags': popular_tags,
-        'best_users': best_users,
         'bootstrap_colors': BOOTSTRAP_COLORS
     }
 
@@ -156,6 +137,46 @@ def register(request):
     
     return render(request, 'register.html', context=context)
 
+def send_to_centrifugo(channel, data):
+    try:
+        centrifugo_url = 'http://localhost:8080/api'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'apikey W9meKPSXZKqsp1NFw9LFPPUZcxOrOsNDPkWmVXxVQaMJwsXNoMmfeStgj8uOvzf-hs1nK2t0hgkw-auGh9zXPw'
+        }
+        
+        payload = {
+            'method': 'publish',
+            'params': {
+                'channel': channel,
+                'data': data
+            }
+        }
+        
+        print(f"Sending to Centrifugo: {centrifugo_url}")
+        print(f"Channel: {channel}")
+        print(f"Data: {data}")
+        
+        response = requests.post(centrifugo_url, json=payload, headers=headers, timeout=5)
+        print(f"Centrifugo response status: {response.status_code}")
+        print(f"Centrifugo response body: {response.text}")
+        
+        if response.status_code == 200:
+            result = response.json()
+            if 'error' in result:
+                print(f"Centrifugo API error: {result['error']}")
+                return False
+            print(f"Message sent to Centrifugo channel {channel} successfully")
+            return True
+        else:
+            print(f"Failed to send message to Centrifugo: {response.status_code} {response.text}")
+            return False
+    except Exception as e:
+        print(f"Error sending message to Centrifugo: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
 def single_question(request, question_id):
     question = get_object_or_404(Question, id=question_id, is_active=True)
     answers = Answer.objects.for_question_with_author(question_id)
@@ -184,6 +205,21 @@ def single_question(request, question_id):
                 answer = form.save(author=request.user, question=question)
                 messages.success(request, 'Answer has been successfully added!')
                 print(f"Answer added by user {request.user.username} to question {question.title}")
+
+                channel = f"question_{question.id}"
+
+                answer_html = render_to_string('single_answer.html', {
+                    'answer': answer,
+                    'user': request.user,
+                    'request': request
+                })
+                
+                answer_data = {
+                    'type': 'new_answer',
+                    'answer_html': answer_html,
+                    'answer_id': answer.id
+                }
+                send_to_centrifugo(channel, answer_data)
 
                 cache.delete('hot_questions')
                 
@@ -333,7 +369,7 @@ def vote_question(request):
 def vote_answer(request):
     try:
         answer_id = request.POST.get('answer_id')
-        vote_type = request.POST.get('vote_type')  # 'like' или 'dislike'
+        vote_type = request.POST.get('vote_type')
         
         if not answer_id or vote_type not in ['like', 'dislike']:
             return JsonResponse({'error': 'Invalid parameters'}, status=400)
@@ -402,3 +438,79 @@ def mark_correct_answer(request):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+def search_questions(request):
+    query = request.GET.get('q', '').strip()
+    
+    if not query or len(query) < 2:
+        return JsonResponse({'results': []})
+    
+    try:
+        if hasattr(Question._meta, 'get_field') and 'postgresql' in str(Question.objects.all().db):
+            search_vector = SearchVector('title', weight='A') + SearchVector('content', weight='B')
+            search_query = SearchQuery(query)
+            
+            questions = Question.objects.annotate(
+                search=search_vector,
+                rank=SearchRank(search_vector, search_query)
+            ).filter(
+                search=search_query,
+                is_active=True
+            ).order_by('-rank')[:10]
+        else:
+            questions = Question.objects.filter(
+                Q(title__icontains=query) | Q(content__icontains=query),
+                is_active=True
+            ).select_related('author')[:10]
+        
+        results = []
+        for question in questions:
+            results.append({
+                'id': question.id,
+                'title': question.title,
+                'content': question.content[:100] + ('...' if len(question.content) > 100 else ''),
+                'author': question.author.username,
+                'created_at': question.created_at.strftime('%d.%m.%Y'),
+                'url': f'/question/{question.id}',
+                'rating': question.rating()
+            })
+        
+        return JsonResponse({'results': results})
+        
+    except Exception as e:
+        print(f"Search error: {e}")
+        return JsonResponse({'results': [], 'error': str(e)})
+
+@require_POST
+@csrf_protect
+def test_centrifugo(request):
+    try:
+        question_id = request.POST.get('question_id')
+        if not question_id:
+            return JsonResponse({'error': 'Question ID required'}, status=400)
+
+        channel = f"question_{question_id}"
+        test_data = {
+            'type': 'test_message',
+            'message': 'Это тестовое сообщение для проверки real-time соединения!',
+            'timestamp': timezone.now().strftime('%d.%m.%Y %H:%M:%S')
+        }
+        
+        success = send_to_centrifugo(channel, test_data)
+        
+        if success:
+            return JsonResponse({
+                'success': True,
+                'message': 'Test message sent successfully',
+                'channel': channel,
+                'data': test_data
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'Failed to send message to Centrifugo'
+            })
+            
+    except Exception as e:
+        print(f"Test Centrifugo error: {e}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

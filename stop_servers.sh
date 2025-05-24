@@ -6,6 +6,7 @@ echo "🔌 Освобождение портов..."
 sudo fuser -k 80/tcp 2>/dev/null || true
 sudo fuser -k 8000/tcp 2>/dev/null || true  
 sudo fuser -k 8081/tcp 2>/dev/null || true
+sudo fuser -k 8080/tcp 2>/dev/null || true
 
 echo "🌐 Остановка nginx..."
 sudo pkill -9 -f nginx 2>/dev/null || true
@@ -24,9 +25,9 @@ sudo rm -rf /tmp/nginx_cache/* 2>/dev/null || true
 echo "✅ Все серверы остановлены и кэш очищен!"
 
 echo "🔍 Проверка портов..."
-if netstat -tlnp 2>/dev/null | grep -E ':(80|8000|8081) ' > /dev/null; then
+if netstat -tlnp 2>/dev/null | grep -E ':(80|8000|8081|8080) ' > /dev/null; then
     echo "⚠️ Некоторые порты все еще заняты:"
-    netstat -tlnp 2>/dev/null | grep -E ':(80|8000|8081) '
+    netstat -tlnp 2>/dev/null | grep -E ':(80|8000|8081|8080) '
 else
     echo "✅ Все порты свободны"
 fi 

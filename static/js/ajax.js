@@ -13,7 +13,6 @@ $(document).ready(function() {
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
 
-    // Функция для показа Toast уведомлений
     function showToast(message, type = 'info') {
         const toastContainer = $('.toast-container');
         if (toastContainer.length === 0) {
@@ -21,20 +20,20 @@ $(document).ready(function() {
         }
         
         let iconColor = 'info';
-        let title = 'Уведомление';
+        let title = 'Notification';
         
         switch(type) {
             case 'success':
                 iconColor = 'success';
-                title = 'Успех';
+                title = 'Success';
                 break;
             case 'error':
                 iconColor = 'danger';
-                title = 'Ошибка';
+                title = 'Error';
                 break;
             case 'warning':
                 iconColor = 'warning';
-                title = 'Предупреждение';
+                title = 'Warning';
                 break;
         }
         
@@ -60,8 +59,7 @@ $(document).ready(function() {
             delay: 5000
         });
         toast.show();
-        
-        // Удаляем toast из DOM после скрытия
+
         $toast[0].addEventListener('hidden.bs.toast', function() {
             $toast.remove();
         });
@@ -100,19 +98,19 @@ $(document).ready(function() {
                     if (!wasActive) {
                         if (voteType === 'like') {
                             button.removeClass('btn-outline-success').addClass('btn-success');
-                            showToast('Вы поставили лайк!', 'success');
+                            showToast('You voted up!', 'success');
                         } else if (voteType === 'dislike') {
                             button.removeClass('btn-outline-danger').addClass('btn-danger');
-                            showToast('Вы поставили дизлайк!', 'info');
+                            showToast('You voted down!', 'info');
                         }
                     } else {
-                        showToast('Голос отменен', 'info');
+                        showToast('Vote revert', 'info');
                     }
                 }
             },
             error: function(xhr) {
                 console.error('Vote error:', xhr.responseJSON);
-                showToast('Ошибка голосования. Попробуйте снова.', 'error');
+                showToast('Vote error.', 'error');
             },
             complete: function() {
                 button.prop('disabled', false);
@@ -153,19 +151,19 @@ $(document).ready(function() {
                     if (!wasActive) {
                         if (voteType === 'like') {
                             button.removeClass('btn-outline-success').addClass('btn-success');
-                            showToast('Вы поставили лайк ответу!', 'success');
+                            showToast('You voted up answer!', 'success');
                         } else if (voteType === 'dislike') {
                             button.removeClass('btn-outline-danger').addClass('btn-danger');
-                            showToast('Вы поставили дизлайк ответу!', 'info');
+                            showToast('You voted down answer!', 'info');
                         }
                     } else {
-                        showToast('Голос за ответ отменен', 'info');
+                        showToast('Your vote is revert', 'info');
                     }
                 }
             },
             error: function(xhr) {
                 console.error('Vote error:', xhr.responseJSON);
-                showToast('Ошибка голосования за ответ. Попробуйте снова.', 'error');
+                showToast('Vote error.', 'error');
             },
             complete: function() {
                 button.prop('disabled', false);
@@ -190,9 +188,9 @@ $(document).ready(function() {
                 if (response.success) {
                     if (response.is_correct) {
                         $('.correct-answer-checkbox').not(checkbox).prop('checked', false);
-                        showToast('Ответ отмечен как правильный!', 'success');
+                        showToast('Asnwer marked as correct!', 'success');
                     } else {
-                        showToast('Отметка правильного ответа снята', 'info');
+                        showToast('Answer unmarked as correct!', 'info');
                     }
 
                     checkbox.prop('checked', response.is_correct);
@@ -200,7 +198,7 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 console.error('Mark correct error:', xhr.responseJSON);
-                showToast('Ошибка отметки ответа. Попробуйте снова.', 'error');
+                showToast('Mark correct error.', 'error');
                 checkbox.prop('checked', !checkbox.prop('checked'));
             },
             complete: function() {

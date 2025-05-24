@@ -8,17 +8,19 @@
         <hr class="hr">
         {% include "pagination.html" %}
 
-        {% for answer in answers %}
-            <div id="{{ answer.id }}">
-                {% include "answer.html" %}
-            </div>
-        {% endfor %}
+        <div id="answers-container">
+            {% for answer in answers %}
+                <div id="answer-{{ answer.id }}">
+                    {% include "answer.html" %}
+                </div>
+            {% endfor %}
+        </div>
 
         <hr class="hr">
         
         {% if user.is_authenticated %}
         <div class="answer-area">
-            <form method="POST" action="{% url 'single_question' question.id %}">
+            <form method="POST" action="{% url 'single_question' question.id %}" id="answer-form">
                 {% csrf_token %}
                 {% if answer_form.non_field_errors %}
                     <div class="alert alert-danger mb-3">
@@ -47,4 +49,109 @@
         {% endif %}
 
     </article>
+
+    <!-- Centrifugo JavaScript client -->
+    <script src="https://unpkg.com/centrifuge@^5/dist/centrifuge.js"></script>
+    <script>
+        $(document).ready(function() {
+            console.log('Initializing Centrifugo connection...');
+
+            const centrifuge = new Centrifuge('ws://localhost:8080/connection/websocket');
+
+            const questionChannel = `question_{{ question.id }}`;
+            console.log('Subscribing to channel:', questionChannel);
+            
+            const sub = centrifuge.newSubscription(questionChannel);
+
+            sub.on('publication', function(ctx) {
+                console.log('New message received:', ctx.data);
+
+                if (ctx.data.type === 'new_answer') {
+                    addNewAnswerToPage(ctx.data.answer_html);
+                    showNotification('New answer added!', 'success');
+                } else if (ctx.data.type === 'test_message') {
+                    console.log('Test message received:', ctx.data.message);
+                    showNotification('Test message received: ' + ctx.data.message, 'info');
+                } else {
+                    console.log('Unknown message type:', ctx.data.type);
+                }
+            });
+
+            sub.on('error', function(err) {
+                console.error('Subscription error:', err);
+            });
+
+            sub.on('subscribing', function(ctx) {
+                console.log('Subscribing to channel...', ctx);
+            });
+
+            sub.on('subscribed', function(ctx) {
+                console.log('Successfully subscribed to channel:', questionChannel);
+            });
+
+            sub.subscribe();
+
+            centrifuge.on('connecting', function(ctx) {
+                console.log('Connecting to Centrifugo...', ctx);
+            });
+
+            centrifuge.on('connected', function(ctx) {
+                console.log('Connected to Centrifugo successfully!', ctx);
+            });
+
+            centrifuge.on('disconnected', function(ctx) {
+                console.log('Disconnected from Centrifugo:', ctx);
+            });
+
+            centrifuge.on('error', function(ctx) {
+                console.error('Centrifugo connection error:', ctx);
+            });
+
+            centrifuge.connect();
+
+            function addNewAnswerToPage(answerHtml) {
+                const answersContainer = $('#answers-container');
+
+                answersContainer.append(answerHtml);
+
+                const newAnswer = answersContainer.children().last();
+                newAnswer.fadeIn(500);
+                
+                console.log('Added new answer to page');
+            }
+
+            function showNotification(message, type) {
+                const toastHtml = `
+                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+                        <div class="toast-header">
+                            <div class="rounded me-2 bg-${type === 'success' ? 'success' : 'info'}" style="width: 20px; height: 20px;"></div>
+                            <strong class="me-auto">${type === 'success' ? 'Success' : 'Info'}</strong>
+                            <small class="text-muted">just now</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                    </div>
+                `;
+                
+                $('.toast-container').append(toastHtml);
+
+                setTimeout(function() {
+                    $('.toast-container .toast:last').remove();
+                }, 3500);
+            }
+
+            function escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+        });
+    </script>
 {% endblock %}

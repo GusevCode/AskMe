@@ -1,0 +1,13 @@
+<section class="mb-3 mt-5">
+    <h3>Popular tags</h3>
+    <div>
+        {% for tag in popular_tags %}
+            <span class="badge rounded-pill text-bg-{{ tag.color_class }} me-1 mb-1 d-inline-flex align-items-center">
+                <a class="" style="color: unset;text-decoration: unset;" href="{% url "tag" tag.name %}">{{ tag.name }}</a>
+                <small class="ms-1 opacity-75">({{ tag.questions_count }})</small>
+            </span>
+        {% empty %}
+            <div class="text-muted">No popular tags yet</div>
+        {% endfor %}
+    </div>
+</section> 

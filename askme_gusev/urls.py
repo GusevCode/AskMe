@@ -36,6 +36,8 @@ urlpatterns = [
     path('ajax/vote-question/', views.vote_question, name='vote_question'),
     path('ajax/vote-answer/', views.vote_answer, name='vote_answer'),
     path('ajax/mark-correct/', views.mark_correct_answer, name='mark_correct_answer'),
+    path('ajax/search/', views.search_questions, name='search_questions'),
+    path('ajax/test-centrifugo/', views.test_centrifugo, name='test_centrifugo'),
     
     path('admin/', admin.site.urls),
 ]

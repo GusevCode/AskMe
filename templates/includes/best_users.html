@@ -1,0 +1,18 @@
+<section>
+    <h3>Best members</h3>
+    <div>
+        {% for profile in best_users %}
+            <div class="d-flex align-items-center justify-content-between mt-2 p-2 bg-dark rounded">
+                <div class="d-flex align-items-center">
+                    <img src="{{ profile.get_avatar_url }}" class="rounded-circle me-2" style="width: 30px; height: 30px;" alt="User avatar">
+                    <span class="text-light">{{ profile.user.username }}</span>
+                </div>
+                <small class="badge bg-primary">
+                    {% if profile.total_question_likes %}{{ profile.total_question_likes }} likes{% elif profile.total_activity %}{{ profile.total_activity }} posts{% else %}{{ profile.question_count }} questions{% endif %}
+                </small>
+            </div>
+        {% empty %}
+            <div class="text-muted">No active users yet</div>
+        {% endfor %}
+    </div>
+</section> 

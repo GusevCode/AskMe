@@ -29,14 +29,12 @@ class LoginForm(forms.Form):
         password = cleaned_data.get('password')
 
         if username and password:
-            # Проверяем авторизацию пользователя
             user = authenticate(username=username, password=password)
             if user is None:
                 raise ValidationError('Invalid username or password!')
             elif not user.is_active:
                 raise ValidationError('Account is disabled!')
-            
-            # Сохраняем пользователя в cleaned_data для использования во view
+
             cleaned_data['user'] = user
 
         return cleaned_data
@@ -211,7 +209,6 @@ class QuestionForm(forms.ModelForm):
 
             tags_input = self.cleaned_data.get('tags_input', '')
             if tags_input:
-                # Список доступных Bootstrap цветов
                 bootstrap_colors = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
                 
                 tag_names = [tag.strip() for tag in tags_input.split(',') if tag.strip()]

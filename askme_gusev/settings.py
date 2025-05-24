@@ -135,7 +135,6 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'app/uploads')
 MEDIA_URL = '/uploads/'
 
-# Кэширование
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

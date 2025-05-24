@@ -106,7 +106,6 @@ $(document).ready(function() {
                 alert('Error voting. Please try again.');
             },
             complete: function() {
-                // Разблокируем кнопку
                 button.prop('disabled', false);
             }
         });
@@ -115,8 +114,7 @@ $(document).ready(function() {
     $('.correct-answer-checkbox').change(function() {
         const checkbox = $(this);
         const answerId = checkbox.data('answer-id');
-        
-        // Блокируем чекбокс на время запроса
+
         checkbox.prop('disabled', true);
         
         $.ajax({

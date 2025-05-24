@@ -1,0 +1,33 @@
+{
+  "client": {
+    "token": {
+      "hmac_secret_key": "1BM5IvlYikgLxVh0hYPmnAuW0wZ7Bnk1QnNCUeenVg6apKggJBd-ZPVwLOyxyEZbeItiYDhZkOhLklJj06T83A"
+    },
+    "allowed_origins": ["*"],
+    "insecure": true
+  },
+  "admin": {
+    "enabled": true,
+    "password": "2UMi1PzQp9ZNTCwG01qnjw",
+    "secret": "p51K0Sh1-mXgSbxkHGwqIk1e9q-dlG0qO-wavj2FH8mMM0rjb4idTpjh3IgDN3GXijcVUqIGKjq6eFrt3iP-7Q"
+  },
+  "http_api": {
+    "key": "W9meKPSXZKqsp1NFw9LFPPUZcxOrOsNDPkWmVXxVQaMJwsXNoMmfeStgj8uOvzf-hs1nK2t0hgkw-auGh9zXPw"
+  },
+  "http_server": {
+    "port": "8080"
+  },
+  "websocket": {
+    "enabled": true
+  },
+  "channel": {
+    "without_namespace": {
+      "publish": true,
+      "subscribe": true,
+      "presence": true,
+      "history": true,
+      "history_size": 100,
+      "history_ttl": "1h"
+    }
+  }
+}
