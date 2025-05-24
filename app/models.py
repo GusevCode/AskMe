@@ -10,7 +10,8 @@ from askme_gusev import settings
 # Managers
 
 class TagManager(models.Manager):
-    def get_or_create(self, name):
+    def get_or_create_by_name(self, name):
+        """Кастомный метод для поиска тега по имени (case-insensitive)"""
         try:
             tag = self.get(name__iexact=name)
             return tag, False
@@ -90,7 +91,7 @@ class Profile(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
-    color_class = models.CharField(max_length=20, blank=True, default='bg-primary')
+    color_class = models.CharField(max_length=20, blank=True, default='primary')
 
     objects = TagManager()
 

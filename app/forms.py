@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+import random
 from app.models import Profile, Question, Answer, Tag
 
 
@@ -212,9 +213,17 @@ class QuestionForm(forms.ModelForm):
 
             tags_input = self.cleaned_data.get('tags_input', '')
             if tags_input:
+                # Список доступных Bootstrap цветов
+                bootstrap_colors = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
+                
                 tag_names = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
                 for tag_name in tag_names:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    tag, created = Tag.objects.get_or_create(
+                        name=tag_name,
+                        defaults={
+                            'color_class': random.choice(bootstrap_colors)
+                        }
+                    )
                     question.tags.add(tag)
         
         return question
