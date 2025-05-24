@@ -5,36 +5,30 @@
     <h1>Register</h1>
 </div>
 <div class="mt-3 settings-form">
-    <form>
-        <div class="form-text text-danger mb-3">Sorry, this email already exist!</div>
-        <div class="mb-3 d-flex justify-content-between gap-2">
-            <label class="col-form-label">Login</label>
-            <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
-        </div>
-        <div class="mb-3 d-flex justify-content-between gap-2">
-            <label class="col-form-label">Email</label>
-            <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
-        </div>
-        <div class="mb-3 d-flex justify-content-between gap-2">
-            <label class="col-form-label">NickName</label>
-            <input class="form-control w-75" maxlength="35" placeholder="Enter login here"></input>
-        </div>
-        <div class="mb-3 d-flex justify-content-between gap-2">
-            <label class="col-form-label">Password</label>
-            <input type="password" class="form-control w-75" maxlength="35" placeholder="Enter password here"></input>
-        </div>
-        <div class="mb-3 d-flex justify-content-between gap-2">
-            <label class="col-form-label">Repeat password</label>
-            <input type="password" class="form-control w-75" maxlength="35" placeholder="Repeat password here"></input>
-        </div>
-        <div class="mb-3 d-flex justify-content-between gap-2">
-            <label class="col-form-label">Upload avatar</label>
-            <div class="avatar-selection-block w-75">
-                <input class="form-control w-100" type="file"></input>
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
             </div>
-        </div>
+        {% endif %}
+        
+        {% for field in form %}
+            <div class="mb-3 d-flex justify-content-between gap-2">
+                <label class="col-form-label">{{ field.label }}</label>
+                <div class="w-75">
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="form-text text-danger">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        
         <div class="mb-3 d-flex justify-content-end">
-            <button class="mt-2 btn btn-outline-success w-75">Register</button>
+            <button type="submit" class="mt-2 btn btn-outline-success w-75">Register</button>
         </div>
     </form>
 </div>

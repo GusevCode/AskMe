@@ -27,34 +27,37 @@
             </form>
 
             <div class="d-flex gap-2 align-items-center">
+                {% if user.is_authenticated %}
                 <div class="user-image">
-                    <img src="{{ MEDIA_URL }}/placeholder.png" class="rounded-circle" alt="User avatar">
+                    {% if user.profile %}
+                        <img src="{{ user.profile.get_avatar_url }}" class="rounded-circle" alt="User avatar">
+                    {% else %}
+                        <img src="{{ MEDIA_URL }}placeholder.png" class="rounded-circle" alt="User avatar">
+                    {% endif %}
                 </div>
                 <div class="content">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-outline-primary">Dr. Peper</button>
+                        <button type="button" class="btn btn-outline-primary">{{ user.username }}</button>
                         <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                           <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
                         <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="{% url "settings" %}">Settings</a></li>
+                          <li><a class="dropdown-item" href="{% url "profile_edit" %}">Settings</a></li>
                           <li><hr class="dropdown-divider"></li>
-                          <li><a class="dropdown-item" href="#">Log out</a></li>
+                          <li><a class="dropdown-item" href="{% url "logout" %}">Log out</a></li>
                         </ul>
                     </div>
                 </div>
-            </div>
-
-            <!--
-            <div class="d-flex gap-2 align-items-center">
+                {% else %}
                 <div class="content">
                     <a class="btn btn-primary link-light link-underline-opacity-0 text-light" href="{% url "login" %}">Login</a>
                     <a class="btn btn-outline-success link-light link-underline-opacity-0 text-success" href="{% url "register" %}">Register</a>
                 </div>
+                {% endif %}
             </div>
-            -->
-        </div>
-    </nav>
+
+            </div>
+        </nav>
 
         <div class="container flex-grow-1">
             <div class="row">

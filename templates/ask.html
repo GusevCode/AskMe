@@ -5,20 +5,32 @@
         <h1>New Question</h1>
     </div>
     <div class="ask-form">
-        <form>
-            <div class="mb-3 d-flex justify-content-between gap-2">
-                <label class="col-form-label">Title</label>
-                <input class="form-control" maxlength="100" placeholder="For example, how to build a nuclear power plant?">
-            </div>
-            <div class="mb-3 d-flex justify-content-between gap-2">
-                <label for="answer-text" class="col-form-label">Text</label>
-                <textarea id="answer-text" class="form-control" maxlength="512" placeholder="For example, how to start building a nuclear power plant for free and without registration?"></textarea>
-            </div>
-            <div class="mb-3 d-flex justify-content-between gap-2">
-                <label class="col-form-label">Tags</label>
-                <input class="form-control" maxlength="64" placeholder="For example, Ruby, C++">
-            </div>
-            <button class="mt-2 btn btn-success">ASK!</button>
+        <form method="POST" action="{% url 'ask' %}">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger mb-3">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% for field in form %}
+                <div class="mb-3 d-flex justify-content-between gap-2">
+                    <label class="col-form-label">{{ field.label }}</label>
+                    <div class="flex-grow-1" style="max-width: 80%;">
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="form-text text-danger">{{ field.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="mt-2 btn btn-success">ASK!</button>
         </form>
     </div>
 {% endblock %}

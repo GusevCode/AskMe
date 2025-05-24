@@ -1,5 +1,11 @@
+from django.contrib import auth
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from app.models import Profile
+from django.contrib.auth.decorators import login_required
+
+from app.forms import LoginForm, RegisterForm, ProfileEditForm, QuestionForm, AnswerForm
 from app.models import Question, Answer, Tag
 from askme_gusev import settings
 
@@ -31,34 +37,112 @@ def index(request):
     context.update({'questions': page.object_list, 'page_obj': page})
     return render(request, 'index.html', context=context)
 
+@login_required
 def ask(request):
-    tags = Tag.objects.popular_tags()
     context = base_context()
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        
+        if form.is_valid():
+            question = form.save(author=request.user)
+            print(f"Question '{question.title}' created by user {request.user.username}")
+            return redirect('single_question', question_id=question.id)
+        else:
+            print(f"Question creation error: {form.errors}")
+            
+        context['form'] = form
+    else:
+        context['form'] = QuestionForm()
+    
     return render(request, 'ask.html', context=context)
 
 def login(request):
-    tags = Tag.objects.popular_tags()
     context = base_context()
+    
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            username = form.cleaned_data['username']
+            
+            auth.login(request, user)
+            print(f"User {username} successfully logged in")
+            
+            # Проверяем параметры continue и next для редиректа
+            continue_url = (request.POST.get('continue') or 
+                          request.GET.get('continue') or 
+                          request.POST.get('next') or 
+                          request.GET.get('next'))
+            if continue_url:
+                return redirect(continue_url)
+            else:
+                return redirect('profile_edit')
+        else:
+            print(f"Login error: {form.non_field_errors()}")
+            
+        context['form'] = form
+    else:
+        context['form'] = LoginForm()
+        
+    # Добавляем continue и next параметры в контекст для сохранения в форме
+    context['continue'] = request.GET.get('continue') or request.GET.get('next', '')
+    
     return render(request, 'login.html', context=context)
 
 def register(request):
-    tags = Tag.objects.popular_tags()
     context = base_context()
+    
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data['username']
+            print(f"User {username} successfully registered")
+            
+            # Автоматически авторизуем пользователя после регистрации
+            auth.login(request, user)
+            return redirect('index')
+        else:
+            print(f"Registration error: {form.errors}")
+            
+        context['form'] = form
+    else:
+        context['form'] = RegisterForm()
+    
     return render(request, 'register.html', context=context)
 
 def single_question(request, question_id):
-    tags = Tag.objects.popular_tags()
+    question = get_object_or_404(Question, id=question_id, is_active=True)
     answers = Answer.objects.for_question_with_author(question_id)
-    question = Question.objects.get(id=question_id)
     page = paginate(answers, request)
+    
     context = base_context()
-    context.update({'question': question, "answers": page.object_list, 'page_obj': page})
-    return render(request, 'single_question.html', context=context)
+    context.update({
+        'question': question, 
+        'answers': page.object_list, 
+        'page_obj': page
+    })
 
-def settings_page(request):
-    tags = Tag.objects.popular_tags()
-    context = base_context()
-    return render(request, 'settings.html', context=context)
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = AnswerForm(request.POST)
+            
+            if form.is_valid():
+                answer = form.save(author=request.user, question=question)
+                print(f"Answer added by user {request.user.username} to question {question.title}")
+
+                return redirect(f'/question/{question_id}#{answer.id}')
+            else:
+                print(f"Answer creation error: {form.errors}")
+                
+            context['answer_form'] = form
+        else:
+            context['answer_form'] = AnswerForm()
+    
+    return render(request, 'single_question.html', context=context)
 
 def hot(request):
     tags = Tag.objects.popular_tags()
@@ -75,3 +159,36 @@ def tag(request, tag_name):
     context = base_context()
     context.update({'questions': page.object_list, 'page_obj': page, 'tag_name': tag_name})
     return render(request, 'tag.html', context=context)
+
+def logout(request):
+    auth.logout(request)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def profile_edit(request):
+    context = base_context()
+    
+    # Профиль должен существовать благодаря сигналу, но на всякий случай проверяем
+    profile, created = Profile.objects.get_or_create(
+        user=request.user,
+        defaults={'avatar': 'placeholder.png'}
+    )
+    
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile, user=request.user)
+        
+        if form.is_valid():
+            form.save()
+            print(f"Profile for user {request.user.username} updated")
+            return redirect('profile_edit')
+        else:
+            print(f"Profile update error: {form.errors}")
+            
+        context['form'] = form
+    else:
+        context['form'] = ProfileEditForm(instance=profile, user=request.user)
+    
+    # Добавляем профиль в контекст для отображения текущего аватара
+    context['profile'] = profile
+    
+    return render(request, 'profile_edit.html', context=context)

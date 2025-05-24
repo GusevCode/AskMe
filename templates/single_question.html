@@ -9,19 +9,42 @@
         {% include "pagination.html" %}
 
         {% for answer in answers %}
-            {% include "answer.html" %}
+            <div id="{{ answer.id }}">
+                {% include "answer.html" %}
+            </div>
         {% endfor %}
 
         <hr class="hr">
+        
+        {% if user.is_authenticated %}
         <div class="answer-area">
-            <form>
+            <form method="POST" action="{% url 'single_question' question.id %}">
+                {% csrf_token %}
+                {% if answer_form.non_field_errors %}
+                    <div class="alert alert-danger mb-3">
+                        {% for error in answer_form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
                 <div class="mb-3">
-                    <label class="col-form-label">Do you have answer?</label>
-                    <textarea id="answer-text" class="form-control" placeholder="Enter your answer here."></textarea>
-                    <button class="mt-2 btn btn-success">Answer</button>
+                    <label class="col-form-label">{{ answer_form.content.label }}</label>
+                    {{ answer_form.content }}
+                    {% if answer_form.content.errors %}
+                        <div class="form-text text-danger">{{ answer_form.content.errors.0 }}</div>
+                    {% endif %}
+                    <button type="submit" class="mt-2 btn btn-success">Answer</button>
                 </div>
             </form>
         </div>
+        {% else %}
+        <div class="answer-area">
+            <p class="text-muted">
+                <a href="{% url 'login' %}?continue={% url 'single_question' question.id %}">Login</a> to answer this question.
+            </p>
+        </div>
+        {% endif %}
 
     </article>
 {% endblock %}

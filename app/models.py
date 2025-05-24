@@ -2,30 +2,12 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count, Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from askme_gusev import settings
 
 # Managers
-
-class UserManager(BaseUserManager):
-    def create_user(self, username, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Users must have an email address')
-
-        user = self.model(
-            username=username,
-            email=self.normalize_email(email),
-            **extra_fields
-        )
-        user.set_password(password)
-        user.save(using=self._db)
-
-        Profile.objects.create(
-            user=user,
-            avatar='placeholder.png'
-        )
-        return user
-
 
 class TagManager(models.Manager):
     def get_or_create(self, name):
@@ -96,8 +78,13 @@ class Profile(models.Model):
         return f"{self.user.username}'s profile"
 
     def get_avatar_url(self):
-        if self.avatar:
-            return self.avatar.url
+        if self.avatar and hasattr(self.avatar, 'url'):
+            try:
+                return self.avatar.url
+            except:
+                return f'{settings.MEDIA_URL}placeholder.png'
+        else:
+            return f'{settings.MEDIA_URL}placeholder.png'
 
 
 class Tag(models.Model):
@@ -173,3 +160,11 @@ class AnswerLike(models.Model):
 
     def __str__(self):
         return f"{self.user.username} {'likes' if self.is_positive else 'dislikes'} answer to {self.answer.question.title}"
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(
+            user=instance,
+            avatar='placeholder.png'
+        )
