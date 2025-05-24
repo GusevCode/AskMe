@@ -1,0 +1,13 @@
+Это тестовый файл в директории uploads для проверки работы nginx.
+Файлы из директории /uploads/ должны отдаваться напрямую через nginx.
+
+Дата создания: $(date)
+Путь: /uploads/test.txt
+
+Этот файл используется для тестирования:
+1. Корректной настройки location /uploads/
+2. Приоритета location /uploads/ над общей статикой
+3. Работы заголовков кэширования
+4. Сжатия файлов
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 

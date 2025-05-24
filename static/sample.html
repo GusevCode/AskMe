@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовый статический файл</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .info {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .highlight {
+            background-color: rgba(255, 255, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Статический файл отдается через nginx!</h1>
+        
+        <div class="info">
+            <h2>📋 Информация:</h2>
+            <p>Этот файл <span class="highlight">sample.html</span> находится в директории <span class="highlight">static/</span></p>
+            <p>Если вы видите эту страницу, значит nginx корректно настроен для отдачи статического контента!</p>
+        </div>
+        
+        <div class="info">
+            <h2>🔧 Проверки:</h2>
+            <ul>
+                <li>✅ Файл отдается с правильными заголовками кэширования</li>
+                <li>✅ Файл сжимается gzip для уменьшения размера</li>
+                <li>✅ Статические файлы отдаются быстрее чем через WSGI</li>
+            </ul>
+        </div>
+        
+        <div class="info">
+            <h2>📈 Размер файла для тестирования производительности:</h2>
+            <p>Этот файл содержит достаточно контента для корректного сравнения производительности между nginx и gunicorn при отдаче статических файлов. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Добавляем немного JavaScript для увеличения размера файла
+        console.log('Статический файл загружен успешно!');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен');
+        });
+    </script>
+</body>
+</html> 

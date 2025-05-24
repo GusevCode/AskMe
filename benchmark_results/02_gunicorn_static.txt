@@ -1,0 +1,55 @@
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        gunicorn
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /static/sample.html
+Document Length:        3616 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.386 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      3982000 bytes
+HTML transferred:       3616000 bytes
+Requests per second:    2592.31 [#/sec] (mean)
+Time per request:       3.858 [ms] (mean)
+Time per request:       0.386 [ms] (mean, across all concurrent requests)
+Transfer rate:          10080.63 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    4   0.6      4       6
+Waiting:        1    4   0.6      3       6
+Total:          1    4   0.6      4       6
+WARNING: The median and mean for the waiting time are not within a normal deviation
+        These results are probably not that reliable.
+
+Percentage of the requests served within a certain time (ms)
+  50%      4
+  66%      4
+  75%      4
+  80%      4
+  90%      5
+  95%      5
+  98%      5
+  99%      6
+ 100%      6 (longest request)

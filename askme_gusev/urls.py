@@ -40,5 +40,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
+# Статические файлы в DEBUG режиме
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Добавляем отдачу статических файлов через Django для тестирования производительности
+# В production это должно делать nginx
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
