@@ -1,9 +1,0 @@
-# Пример crontab для автоматического обновления кэша
-# Запуск каждые 30 минут
-*/30 * * * * /home/Alexey/Projects/technopark/Web/askme_gusev/update_cache.sh
-
-# Или можно запускать каждый час в 15 минут
-# 15 * * * * /home/Alexey/Projects/technopark/Web/askme_gusev/update_cache.sh
-
-# Для установки этой конфигурации выполните:
-# crontab crontab_example 
